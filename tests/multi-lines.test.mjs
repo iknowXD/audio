@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {createTimeline} from '../src/lyric-timeline.mjs';
+import {validateProject,exportTtml} from '../src/timed-lyrics.mjs';
+import {draftLines,markLine,finishLine,materializeLines} from '../src/line-draft.mjs';
+import {retimeLine} from '../src/timing.mjs';
+test('three overlapping singers remain active independently, including backwards seeks',()=>{const rows=[{time:1,end:10,words:[{time:2,end:10}]},{time:3,end:7,words:[{time:3,end:7}]},{time:4,end:6,words:[{time:4,end:6}]}];const at=createTimeline(rows);assert.deepEqual(at(1),[]);assert.deepEqual(at(5),[0,1,2]);assert.deepEqual(at(6),[0,1]);assert.deepEqual(at(8),[0]);assert.deepEqual(at(5),[0,1,2]);assert.deepEqual(at(10),[]);});
+test('export accepts overlaps between rows, but rejects overlaps within a row',()=>{const p={version:1,title:'',artist:'',language:'ru',duration:20,lines:[{time:1,end:9,text:'a',words:[{text:'a',time:1,end:9}]},{time:2,end:8,text:'b',words:[{text:'b',time:2,end:8}]}]};assert.deepEqual(validateProject(p),[]);assert.match(exportTtml(p),/00:00:09.000/);assert.equal(retimeLine(p,1,3,10).end,10);p.lines[0].words.push({text:'c',time:4,end:6});assert.ok(validateProject(p).length);});
+test('text to lines keeps instrumental gaps and moves directly to word tokens',()=>{const texts=draftLines('First line\n\nSecond line');let marks=markLine([],2);marks=finishLine(marks,4);marks=markLine(marks,8);marks=finishLine(marks,10);const lines=materializeLines(texts,marks);assert.equal(lines[0].end,4);assert.equal(lines[1].time,8);assert.equal(lines[0].words[0].time,null);assert.throws(()=>materializeLines(texts,marks.slice(0,1)));assert.throws(()=>markLine(marks,7));});
