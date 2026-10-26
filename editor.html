@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b0b0d"><title>Редактор TTML · Audio</title><meta name="description" content="Размечай слова в ритм музыки. Из LRC в TTML — прямо в браузере."></head>
+<body class="editor-page">
+  <header class="editor-header"><a href="/" class="wordmark">audio<span class="wordmark-dot"></span></a><div class="editor-heading">Редактор текста <span>LRC → TTML</span></div><a class="back-link" href="/">← К плееру</a></header>
+  <div class="editor-shell">
+    <aside class="editor-sidebar">
+      <div class="sidebar-heading"><span>Строки песни</span><span id="line-count">0</span></div>
+      <button id="create-lrc" class="secondary-button wide">Создать LRC из текста</button><button id="import-lyrics" class="secondary-button wide">+ Добавить LRC / TTML</button>
+      <div id="line-list" class="line-list"><div class="sidebar-empty">Здесь появятся строки<br>из твоего файла</div></div>
+      <div class="sidebar-bottom"><span id="save-status" role="status">Всё остаётся на устройстве</span><button id="save-project" class="quiet-button">Скачать проект JSON ↓</button><button id="load-project" class="quiet-button">Открыть проект JSON ↗</button></div>
+    </aside>
+    <main class="editor-main">
+      <section id="line-maker" class="line-maker" hidden>
+<div class="timing-heading"><h2>Текст → LRC → слова</h2><button id="close-maker" class="quiet-button">Закрыть</button></div>
+<label>Вставь текст: каждая строка отдельно<textarea id="plain-lyrics" rows="7" placeholder="Первая строка&#10;Вторая строка"></textarea></label>
+<p id="line-capture-status" role="status">Добавь аудио, вставь текст и начни разметку.</p>
+<div class="line-capture-controls"><button id="capture-start" class="primary-button">Начать строки</button><button id="capture-next" class="secondary-button">Пробел · следующая строка</button><button id="capture-gap" class="secondary-button">Enter · пауза в тексте</button><button id="capture-audio" class="quiet-button">Пуск / пауза музыки</button><button id="capture-undo" class="quiet-button">Отменить отметку</button><button id="capture-finish" class="primary-button">Перейти к словам →</button></div>
+<p class="line-timing-note">Пробел отмечает начало следующей строки. Enter завершает текущую: музыка продолжает играть, а в тексте остаётся пауза. После последней строки нажми Enter. Кнопки также работают касанием.</p></section>
+<section class="editor-intro" id="editor-intro"><span class="eyebrow">Слова в твоём ритме</span><h1>Поймай момент<br>каждого слова.</h1><p>Добавь песню и LRC. Слушай и нажимай пробел<br>на каждом слове — мы запомним время.</p><button id="import-all" class="primary-button">Добавить песню и текст <span>↗</span></button><span class="intro-hint">Или перетащи файлы в окно</span></section>
+      <div id="editor-workspace" hidden>
+        <section class="editor-track"><div class="track-letter" aria-hidden="true">♫</div><div><h1 id="editor-song">Добавь аудио для разметки</h1><p id="editor-file">Текст и отметки сохраняются автоматически</p></div><button id="import-audio" class="secondary-button">Открыть аудио</button></section>
+        <div class="workspace-toolbar"><div class="segment"><button id="mode-edit" class="chosen" aria-pressed="true">Разметка</button><button id="mode-preview" aria-pressed="false">Просмотр</button></div><div class="history-actions"><button id="undo" title="Отменить (⌘Z)" aria-label="Отменить">↶</button><button id="redo" title="Повторить (⌘⇧Z)" aria-label="Повторить">↷</button></div></div>
+        <section id="record-stage" class="record-stage" tabindex="-1" aria-label="Область разметки">
+          <div class="stage-top"><span id="stage-label">ВЫБЕРИ СТРОКУ</span><span id="word-count"></span></div>
+          <div id="stage-words" class="stage-words"></div>
+          <div id="record-hint" class="record-hint">Выбери строку слева</div>
+          <div id="record-actions" class="record-actions"><button id="start-record" class="primary-button">● Разметить строку</button><button id="mark-word" class="mark-button" hidden>Пробел · Отметить слово</button><button id="stop-record" class="secondary-button" hidden>Завершить</button></div>
+        </section>
+        <div class="editor-transport"><audio id="editor-audio" controls preload="auto"></audio><label class="speed-label">Скорость <select id="speed" aria-label="Скорость воспроизведения"><option value="0.5">0,5×</option><option value="0.65">0,65×</option><option value="0.75">0,75×</option><option value="0.9">0,9×</option><option value="1" selected>1×</option></select></label></div>
+        <div class="editor-options"><label>Способ разметки<select id="record-mode"><option value="tap">Нажатие → следующее слово</option><option value="hold">Удержание → начало и конец</option></select></label><label class="checkbox-label"><input id="loop-line" type="checkbox"> Повторять строку при просмотре</label><button id="listen-line" class="quiet-button">↻ Слушать строку</button></div>
+          <div class="editor-clock">Сейчас <output id="editor-position">00:00.000</output><span>минуты:секунды.миллисекунды</span></div>
+        <section id="edit-tools" class="edit-tools">
+          <div class="timing-panel line-timing-panel"><div class="timing-heading"><strong>Вся строка · LRC / TTML</strong><span id="line-duration"></span></div><div class="timing-inputs"><label>Метка начала строки<input id="line-start" type="text" placeholder="00:00.000" spellcheck="false"></label><button id="line-start-now" class="quiet-button" title="Начало строки по текущей позиции аудио">Начало сейчас</button><label>Конец строки<input id="line-end" type="text" placeholder="00:00.000" spellcheck="false"></label><button id="line-end-now" class="quiet-button" title="Конец строки по текущей позиции аудио">Конец сейчас</button><button id="apply-line-timing" class="secondary-button">Применить строку</button></div><div class="line-tempo"><label>Темп строки<select id="line-speed"><option value="0.5">0,5× · вдвое длиннее</option><option value="0.8">0,8× · медленнее</option><option value="1" selected>1×</option><option value="1.25">1,25× · быстрее</option><option value="2">2× · вдвое короче</option></select></label><button id="apply-line-speed" class="secondary-button">Изменить темп</button></div><p id="line-playback-start" class="line-timing-note"></p><p class="line-timing-note">Меняет время всей строки. Если слова уже размечены, их отметки сдвинутся и растянутся вместе со строкой.</p></div>
+          <div class="timing-panel"><div class="timing-heading"><strong id="selected-word-label">Выбери слово для правки</strong><span id="word-state"></span></div><div class="timing-inputs"><label>Начало слова<input id="word-start" type="text" placeholder="00:00.000" spellcheck="false"></label><label>Конец слова<input id="word-end" type="text" placeholder="00:00.000" spellcheck="false"></label><button id="word-start-now" class="quiet-button">Начало сейчас</button><button id="word-end-now" class="quiet-button">Конец сейчас</button><button id="apply-timing" class="secondary-button">Применить</button><button id="record-from-word" class="quiet-button">Разметить отсюда</button></div><button id="confirm-line" class="quiet-button">✓ Подтвердить концы слов этой строки</button></div>
+          <details class="text-details"><summary>Изменить текст / выбрать перевод</summary><label id="variant-label" hidden>Основная строка<select id="text-variant"></select></label><textarea id="line-text" rows="2" aria-label="Текст выбранной строки" placeholder="Разделяй слова пробелами"></textarea><button id="apply-text" class="secondary-button">Применить текст</button></details>
+        </section>
+        <section class="export-bar"><div><strong id="completion">Размечено 0 из 0 слов</strong><span id="completion-hint">Отметки сохраняются в этом браузере</span></div><div class="export-actions"><button id="export-lrc" class="secondary-button">Скачать LRC ↓</button><button id="export-ttml" class="primary-button">Скачать TTML ↓</button></div></section>
+        <div class="editor-shortcuts"><span><kbd>Пробел</kbd> отметка при записи</span><span><kbd>P</kbd> пуск / пауза</span><span><kbd>Esc</kbd> завершить запись</span><span><kbd>⌘ Z</kbd> отменить</span></div>
+      </div>
+    </main>
+  </div>
+  <div id="editor-drop" class="editor-drop" hidden><span>+</span><h2>Добавь песню и текст</h2><p>Аудио · LRC · TTML · проект JSON</p></div>
+  <div id="editor-toast" class="editor-toast" role="status" aria-live="polite" hidden></div>
+  <dialog id="confirm-dialog"><h2 id="dialog-title">Заменить разметку?</h2><p id="dialog-text"></p><div><button id="dialog-cancel" class="secondary-button">Отмена</button><button id="dialog-ok" class="primary-button">Продолжить</button></div></dialog>
+  <input id="editor-files" type="file" multiple accept="audio/*,.mp3,.flac,.m4a,.alac,.aac,.wav,.aiff,.ogg,.opus,.wma,.ape,.wv,.caf,.lrc,.ttml,.xml,.json" hidden>
+  <input id="editor-lyrics-input" type="file" accept=".lrc,.ttml,.xml" hidden>
+  <input id="editor-audio-input" type="file" accept="audio/*,.mp3,.flac,.m4a,.alac,.aac,.wav,.aiff,.ogg,.opus,.wma,.ape,.wv,.caf" hidden>
+  <input id="editor-project-input" type="file" accept=".json" hidden>
+  <script type="module" src="/src/editor.js"></script>
+</body></html>

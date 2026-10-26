@@ -1,0 +1,14 @@
+node_modules/
+dist/
+artifacts/
+.DS_Store
+.sites-local/
+
+.local-data/
+.dev.vars*
+.env*
+.wrangler/
+.sites-runtime/
+
+# Generated from the pinned npm package during build
+public/codecs/

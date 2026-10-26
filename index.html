@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Твоя музыка и синхронный текст. Перетащи аудио и LRC — всё остаётся на твоём устройстве." />
+  <title>Audio · Твоя музыка</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23000'/%3E%3Cpath d='M24 42V20l23-4v21M24 24l23-4' fill='none' stroke='white' stroke-width='4'/%3E%3Cellipse cx='18' cy='43' rx='8' ry='6' fill='white'/%3E%3Cellipse cx='41' cy='38' rx='8' ry='6' fill='white'/%3E%3C/svg%3E" />
+</head>
+<body class="service-mode">
+  <div id="ambient" aria-hidden="true"><div class="glow glow-one"></div><div class="glow glow-two"></div><div class="glow glow-three"></div><div class="beat-halo"></div></div>
+  <div class="grain" aria-hidden="true"></div>
+  <header>
+    <button id="library-toggle" class="wordmark" aria-label="Открыть библиотеку" aria-controls="service-sidebar" aria-expanded="false">audio<span class="wordmark-dot"></span></button>
+    <div class="header-actions">
+      <button id="fullscreen" class="icon-button" aria-label="На весь экран" title="На весь экран"><svg viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button>
+    </div>
+  </header>
+
+  <main id="empty" class="empty-state">
+    <button id="drop-button" class="drop-target" aria-label="Открыть библиотеку песен">
+      <span class="empty-icon"><svg viewBox="0 0 48 48"><path d="M20 33V13l18-4v20M20 17l18-4"/><ellipse cx="14" cy="34" rx="6" ry="4.5"/><ellipse cx="32" cy="30" rx="6" ry="4.5"/></svg></span>
+      <span class="empty-title">Твоя музыка. Рядом.</span>
+      <span class="empty-subtitle">Открой библиотеку или перетащи песни сюда</span>
+      <span class="format-hint">MP3 · FLAC · M4A / ALAC · WAV · AAC · и другие</span>
+    </button>
+    <p class="empty-note">К песне можно сразу добавить <span>.lrc или .ttml</span></p>
+  </main>
+
+  <main id="player" class="player" hidden>
+    <section class="track-panel" aria-label="Текущая песня">
+      <div class="cover">
+        <img id="cover-image" alt="Обложка альбома" hidden /><video id="cover-video" muted loop playsinline hidden></video>
+        <svg id="cover-placeholder" viewBox="0 0 48 48"><path d="M20 33V13l18-4v20M20 17l18-4"/><ellipse cx="14" cy="34" rx="6" ry="4.5"/><ellipse cx="32" cy="30" rx="6" ry="4.5"/></svg>
+        </div>
+      <div class="track-meta"><h1 id="track-title"></h1><p id="track-artist"></p></div>
+      <div class="transport">
+        <label class="seek-label" for="seek">Позиция воспроизведения</label>
+        <input type="range" id="seek" class="seek" min="0" max="100" value="0" step="0.01" aria-label="Позиция воспроизведения" />
+        <div class="time-row"><span id="elapsed">0:00</span><span id="remaining">−0:00</span></div>
+        <div class="play-row"><button id="shuffle" class="queue-button" aria-label="Перемешивание" aria-pressed="false" disabled><svg viewBox="0 0 24 24"><path d="M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 4-3 5-6s4-6 7-6h3m-4-4 4 4-4 4"/></svg></button><button id="previous" class="queue-button skip-button" aria-label="Предыдущая песня" disabled><svg viewBox="0 0 24 24"><path d="M5 4v16M19 5 8 12l11 7Z"/></svg></button><button id="play" class="play-button" aria-label="Воспроизвести" disabled><svg id="play-icon" viewBox="0 0 32 32"><path d="M10 5L27 16 10 27Z"/></svg><svg id="pause-icon" viewBox="0 0 32 32" hidden><path d="M8 6h6v20H8zm10 0h6v20h-6z"/></svg></button><button id="next" class="queue-button skip-button" aria-label="Следующая песня" disabled><svg viewBox="0 0 24 24"><path d="M19 4v16M5 5l11 7-11 7Z"/></svg></button><button id="repeat" class="queue-button" aria-label="Повтор: выключен" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 10V7a3 3 0 0 1 3-3h12l-3-3m3 3-3 3M20 14v3a3 3 0 0 1-3 3H5l3 3m-3-3 3-3"/></svg><span id="repeat-one" hidden>1</span></button><span id="audio-busy" class="audio-busy" hidden></span></div>
+        <div class="volume-row"><button id="mute" class="icon-button" aria-label="Выключить звук"><svg viewBox="0 0 24 24"><path d="M10 5L5 9H2v6h3l5 4zM15 8a6 6 0 010 8m3-11a10 10 0 010 14"/></svg></button><input id="volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Громкость"/><span class="volume-end"><svg viewBox="0 0 24 24"><path d="M10 5L5 9H2v6h3l5 4zM15 8a6 6 0 010 8m3-11a10 10 0 010 14"/></svg></span></div>
+      </div>
+    </section>
+    <section id="lyrics-panel" class="lyrics-panel" aria-label="Текст песни">
+      <div id="lyrics-empty" class="lyrics-empty"><span class="lyrics-symbol">≋</span><h2>Пусть звучит музыка.</h2><p>Текст можно привязать к песне в библиотеке.</p></div>
+      <div id="lyrics-viewport" class="lyrics-viewport" hidden><div id="lyrics-lines" class="lyrics-lines"></div></div>
+    </section>
+  </main>
+
+  <footer><button id="motion-toggle" class="subtle-button" hidden aria-pressed="true" title="Включить или выключить движение фона">Живой фон <span id="motion-status">вкл.</span></button></footer>
+  <dialog id="library-dialog" class="library-dialog" aria-labelledby="library-heading">
+    <div class="library-heading"><div><span class="eyebrow">audio / library</span><h2 id="library-heading">Моя музыка <span id="library-count">0</span></h2></div><button id="library-close" class="dialog-close" aria-label="Закрыть библиотеку">×</button></div>
+    <button id="library-add" class="library-add">＋ Добавить песни и текст</button>
+    <p class="library-help">Выбери аудио вместе с LRC или TTML. При добавлении нескольких песен текст привязывается по одинаковым именам файлов.</p>
+    <p id="library-empty" class="library-empty">Здесь будет твоя музыка.<br>Добавь первую песню.</p>
+    <div id="library-list" class="library-list"></div>
+    <p id="library-message" role="status"></p>
+    <div class="library-footer">
+      <a class="library-editor-link" href="/editor.html" target="_blank" rel="noopener" title="Открыть редактор в новой вкладке"><span><strong>Редактор субтитров</strong><small>Создать LRC · Разметить слова в TTML</small></span><span aria-hidden="true">↗</span></a>
+      <p class="library-storage">Песни сохранены в этом браузере.</p>
+    </div>
+  </dialog>
+  <dialog id="song-edit" class="song-edit" aria-labelledby="song-edit-heading">
+    <form id="song-edit-form"><h2 id="song-edit-heading">Настройки песни</h2>
+      <label class="publish-field"><input id="song-published" type="checkbox"> Опубликовано · доступно в поиске всем</label><label>Название<input id="song-title" maxlength="200" required></label>
+      <label>Артист<input id="song-artist" maxlength="200"></label>
+      <div class="field-pair"><label>Альбом<input id="song-album" maxlength="200"></label><label>Артист альбома<input id="song-album-artist" maxlength="200" placeholder="Если отличается"></label></div><div class="field-pair"><label>Год<input id="song-year" maxlength="4" inputmode="numeric"></label><label>Номер песни<input id="song-number" type="number" min="0" max="999"></label></div><label>Жанр<input id="song-genre" maxlength="100"></label><label>Обложка · фото, GIF или видео<input id="song-cover" type="file" accept="image/*,video/mp4,video/webm,video/quicktime"></label>
+      <label>Текст LRC / TTML<input id="song-lyrics" type="file" accept=".lrc,.ttml,.xml"></label>
+      <p id="song-lyrics-name"></p><p id="song-edit-error" role="alert" hidden></p><div class="song-edit-actions"><button id="song-edit-cancel" type="button">Отмена</button><button id="song-save" type="submit">Сохранить</button></div>
+    </form>
+  </dialog>
+  <div id="drop-overlay" class="drop-overlay" hidden><div class="drop-frame"><span class="drop-plus">+</span><h2>Отпусти. И слушай.</h2><p>Аудио, текст LRC / TTML или обложка</p></div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <input id="file-input" type="file" accept="audio/*,.mp3,.flac,.m4a,.alac,.aac,.wav,.aiff,.aif,.ogg,.opus,.wma,.ape,.wv,.caf,.lrc,.ttml,.xml,image/*,video/mp4,video/webm,video/quicktime" multiple hidden />
+  <audio id="audio" preload="auto"></audio>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
