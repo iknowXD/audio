@@ -12,3 +12,7 @@ artifacts/
 
 # Generated from the pinned npm package during build
 public/codecs/
+
+/Проверка*.md
+/ПРОВЕРКА*.md
+/ТЗ-*.md
