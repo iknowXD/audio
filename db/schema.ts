@@ -1,0 +1,11 @@
+import {sqliteTable,text,integer,primaryKey,uniqueIndex,index} from 'drizzle-orm/sqlite-core';
+export const users=sqliteTable('users',{id:text().primaryKey(),googleSubject:text('google_subject'),githubSubject:text('github_subject'),provider:text().notNull(),subject:text().notNull(),email:text().notNull(),name:text().notNull(),passwordHash:text('password_hash'),salt:text(),admin:integer().notNull().default(0),created:integer().notNull()},t=>[uniqueIndex('user_identity').on(t.provider,t.subject),uniqueIndex('google_identity').on(t.googleSubject),uniqueIndex('github_identity').on(t.githubSubject)]);
+export const sessions=sqliteTable('sessions',{hash:text().primaryKey(),userId:text('user_id').notNull(),csrf:text().notNull(),expires:integer().notNull()});
+export const flows=sqliteTable('oauth_flows',{hash:text().primaryKey(),provider:text().notNull().default('google'),userId:text('user_id'),nonce:text().notNull(),verifier:text().notNull(),expires:integer().notNull()});
+export const limits=sqliteTable('auth_limits',{key:text().primaryKey(),count:integer().notNull(),expires:integer().notNull()});
+export const catalog=sqliteTable('catalog',{id:text().primaryKey(),data:text().notNull(),search:text().notNull(),published:integer().notNull().default(0),added:integer().notNull()});
+export const assets=sqliteTable('media',{id:text().primaryKey(),ownerId:text('owner_id').notNull(),kind:text().notNull(),mime:text().notNull(),filename:text().notNull(),size:integer().notNull(),storageKey:text('storage_key').notNull(),created:integer().notNull()});
+export const profiles=sqliteTable('profiles',{id:text().primaryKey(),kind:text().notNull(),data:text().notNull()});
+export const library=sqliteTable('library',{userId:text('user_id').notNull(),trackId:text('track_id').notNull(),added:integer().notNull(),favorite:integer().notNull().default(0),playCount:integer('play_count').notNull().default(0),lastPlayed:integer('last_played').notNull().default(0)},t=>[primaryKey({columns:[t.userId,t.trackId]}),index('library_user').on(t.userId)]);
+export const playlists=sqliteTable('playlists',{id:text().notNull(),userId:text('user_id').notNull(),data:text().notNull()},t=>[primaryKey({columns:[t.userId,t.id]})]);
+export const uploads=sqliteTable('uploads',{id:text().primaryKey(),ownerId:text('owner_id').notNull(),data:text().notNull(),expires:integer().notNull()});
