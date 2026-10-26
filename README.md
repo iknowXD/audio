@@ -2,8 +2,6 @@
 
 Музыкальная медиатека с синхронными текстами песен и редактором LRC / TTML.
 
-[Открыть Audio](https://hellcat-audio-lyrics.gardentune257.chatgpt.site/)
-
 ## Что умеет
 
 - Вход через Google, GitHub или почту и пароль.
