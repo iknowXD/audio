@@ -1,0 +1,11 @@
+.lyric-word{position:relative;display:inline-block;white-space:pre;vertical-align:baseline;color:#ffffff55;transition:none}
+.word-base,.word-fill{white-space:inherit}
+.lyric-word>.word-fill{position:absolute;inset:0;color:#fff;clip-path:none;pointer-events:none;opacity:var(--word-opacity,0);-webkit-mask-image:linear-gradient(to right,#000 var(--word-progress,0%),transparent calc(var(--word-progress,0%) + 12px));mask-image:linear-gradient(to right,#000 var(--word-progress,0%),transparent calc(var(--word-progress,0%) + 12px))}
+.lyric-glyph{display:inline-block;transform:translate3d(0,calc(1.5px - 1.5px * clamp(0,calc(var(--word-lift,0) - var(--glyph-phase,0)),1)),0)}
+.lyric-line.active .lyric-glyph,.preview-stage .lyric-glyph{will-change:transform}
+.word-live .word-fill{text-shadow:0 0 12px #ffffff24}
+.lyric-line:not(.active) .word-fill{opacity:0}
+.lyric-line:not(.active) .lyric-word{color:inherit;transform:translateY(1.5px)}
+.lyric-line:not(.active) .lyric-glyph{transform:none;will-change:auto}
+.lyrics-lines .lyric-line{transition:color .14s linear,filter .2s ease,transform .55s cubic-bezier(.2,1.15,.3,1)}
+@media(prefers-reduced-motion:reduce){.lyric-glyph{transform:none!important;will-change:auto}.word-live .word-fill{text-shadow:none}}
